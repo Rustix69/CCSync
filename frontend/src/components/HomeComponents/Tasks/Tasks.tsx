@@ -104,6 +104,8 @@ export const Tasks = (
   const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
   const [_isDialogOpen, setIsDialogOpen] = useState(false);
   const [tagInput, setTagInput] = useState('');
+  const [isCreatingNewProject, setIsCreatingNewProject] = useState(false);
+  const [customProjectInput, setCustomProjectInput] = useState('');
 
   const [isEditing, setIsEditing] = useState(false);
   const [editedDescription, setEditedDescription] = useState('');
@@ -310,6 +312,8 @@ export const Tasks = (
           due: '',
           tags: [],
         });
+        setIsCreatingNewProject(false);
+        setCustomProjectInput('');
         setIsAddTaskOpen(false);
       } catch (error) {
         console.error('Failed to add task:', error);
@@ -775,25 +779,76 @@ export const Tasks = (
                             </div>
 
                             <div className="grid grid-cols-4 items-center gap-4">
-                              <Label
-                                htmlFor="description"
-                                className="text-right"
-                              >
+                              <Label htmlFor="project" className="text-right">
                                 Project
                               </Label>
-                              <Input
-                                id="project"
-                                name="project"
-                                type=""
-                                value={newTask.project}
-                                onChange={(e) =>
-                                  setNewTask({
-                                    ...newTask,
-                                    project: e.target.value,
-                                  })
-                                }
-                                className="col-span-3"
-                              />
+                              <div className="col-span-3">
+                                {!isCreatingNewProject ? (
+                                  <select
+                                    id="project"
+                                    name="project"
+                                    value={newTask.project}
+                                    onChange={(e) => {
+                                      if (e.target.value === '__create_new__') {
+                                        setIsCreatingNewProject(true);
+                                        setNewTask({
+                                          ...newTask,
+                                          project: '',
+                                        });
+                                      } else {
+                                        setNewTask({
+                                          ...newTask,
+                                          project: e.target.value,
+                                        });
+                                      }
+                                    }}
+                                    className="border rounded-md px-2 py-2 w-full bg-black text-white"
+                                  >
+                                    <option value="">Select a project</option>
+                                    {uniqueProjects.map((project) => (
+                                      <option key={project} value={project}>
+                                        {project}
+                                      </option>
+                                    ))}
+                                    <option value="__create_new__">
+                                      + Create New Project
+                                    </option>
+                                  </select>
+                                ) : (
+                                  <div className="flex gap-2">
+                                    <Input
+                                      id="project-custom"
+                                      name="project-custom"
+                                      type="text"
+                                      placeholder="Enter new project name"
+                                      value={customProjectInput}
+                                      onChange={(e) => {
+                                        setCustomProjectInput(e.target.value);
+                                        setNewTask({
+                                          ...newTask,
+                                          project: e.target.value,
+                                        });
+                                      }}
+                                      className="flex-1"
+                                    />
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => {
+                                        setIsCreatingNewProject(false);
+                                        setCustomProjectInput('');
+                                        setNewTask({
+                                          ...newTask,
+                                          project: '',
+                                        });
+                                      }}
+                                      className="px-2"
+                                    >
+                                      ✕
+                                    </Button>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
                               <Label htmlFor="due" className="text-right">
@@ -861,7 +916,11 @@ export const Tasks = (
                           <DialogFooter>
                             <Button
                               variant="secondary"
-                              onClick={() => setIsAddTaskOpen(false)}
+                              onClick={() => {
+                                setIsCreatingNewProject(false);
+                                setCustomProjectInput('');
+                                setIsAddTaskOpen(false);
+                              }}
                             >
                               Cancel
                             </Button>
@@ -1798,25 +1857,76 @@ export const Tasks = (
                             </div>
 
                             <div className="grid grid-cols-4 items-center gap-4">
-                              <Label
-                                htmlFor="description"
-                                className="text-right"
-                              >
+                              <Label htmlFor="project" className="text-right">
                                 Project
                               </Label>
-                              <Input
-                                id="project"
-                                name="project"
-                                type=""
-                                value={newTask.project}
-                                onChange={(e) =>
-                                  setNewTask({
-                                    ...newTask,
-                                    project: e.target.value,
-                                  })
-                                }
-                                className="col-span-3"
-                              />
+                              <div className="col-span-3">
+                                {!isCreatingNewProject ? (
+                                  <select
+                                    id="project"
+                                    name="project"
+                                    value={newTask.project}
+                                    onChange={(e) => {
+                                      if (e.target.value === '__create_new__') {
+                                        setIsCreatingNewProject(true);
+                                        setNewTask({
+                                          ...newTask,
+                                          project: '',
+                                        });
+                                      } else {
+                                        setNewTask({
+                                          ...newTask,
+                                          project: e.target.value,
+                                        });
+                                      }
+                                    }}
+                                    className="border rounded-md px-2 py-2 w-full bg-black text-white"
+                                  >
+                                    <option value="">Select a project</option>
+                                    {uniqueProjects.map((project) => (
+                                      <option key={project} value={project}>
+                                        {project}
+                                      </option>
+                                    ))}
+                                    <option value="__create_new__">
+                                      + Create New Project
+                                    </option>
+                                  </select>
+                                ) : (
+                                  <div className="flex gap-2">
+                                    <Input
+                                      id="project-custom"
+                                      name="project-custom"
+                                      type="text"
+                                      placeholder="Enter new project name"
+                                      value={customProjectInput}
+                                      onChange={(e) => {
+                                        setCustomProjectInput(e.target.value);
+                                        setNewTask({
+                                          ...newTask,
+                                          project: e.target.value,
+                                        });
+                                      }}
+                                      className="flex-1"
+                                    />
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => {
+                                        setIsCreatingNewProject(false);
+                                        setCustomProjectInput('');
+                                        setNewTask({
+                                          ...newTask,
+                                          project: '',
+                                        });
+                                      }}
+                                      className="px-2"
+                                    >
+                                      ✕
+                                    </Button>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
                               <Label htmlFor="due" className="text-right">
@@ -1845,7 +1955,11 @@ export const Tasks = (
                           <DialogFooter>
                             <Button
                               variant="secondary"
-                              onClick={() => setIsAddTaskOpen(false)}
+                              onClick={() => {
+                                setIsCreatingNewProject(false);
+                                setCustomProjectInput('');
+                                setIsAddTaskOpen(false);
+                              }}
                             >
                               Cancel
                             </Button>
