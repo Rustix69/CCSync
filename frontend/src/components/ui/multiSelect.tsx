@@ -3,6 +3,7 @@ import { Check, ChevronsUpDown } from 'lucide-react';
 
 import { cn } from '@/components/utils/utils';
 import { Button } from '@/components/ui/button';
+import { FilterStats } from '@/components/utils/types';
 import {
   Command,
   CommandEmpty,
@@ -25,6 +26,7 @@ interface MultiSelectFilterProps {
   selectedValues: string[];
   onSelectionChange: (values: string[]) => void;
   className?: string;
+  optionStats?: Record<string, FilterStats>;
 }
 
 export function MultiSelectFilter({
@@ -33,6 +35,7 @@ export function MultiSelectFilter({
   selectedValues,
   onSelectionChange,
   className,
+  optionStats,
 }: MultiSelectFilterProps) {
   const [open, setOpen] = React.useState(false);
 
@@ -82,18 +85,27 @@ export function MultiSelectFilter({
               </CommandItem>
               {options.map((option) => {
                 const isSelected = selectedValues.includes(option);
+                const stats = optionStats?.[option];
                 return (
                   <CommandItem
                     key={option}
                     onSelect={() => handleSelect(option)}
+                    className="flex items-center justify-between"
                   >
-                    <Check
-                      className={cn(
-                        'mr-2 h-4 w-4',
-                        isSelected ? 'opacity-100' : 'opacity-0'
-                      )}
-                    />
-                    {option}
+                    <div className="flex items-center flex-1 min-w-0">
+                      <Check
+                        className={cn(
+                          'mr-2 h-4 w-4 flex-shrink-0',
+                          isSelected ? 'opacity-100' : 'opacity-0'
+                        )}
+                      />
+                      <span className="truncate">{option}</span>
+                    </div>
+                    {stats && (
+                      <span className="ml-2 text-xs text-muted-foreground flex-shrink-0">
+                        {stats.completed}/{stats.total} ({stats.percentage}%)
+                      </span>
+                    )}
                   </CommandItem>
                 );
               })}

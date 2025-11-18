@@ -1,5 +1,5 @@
-import { useEffect, useState, useCallback } from 'react';
-import { Task } from '../../utils/types';
+import { useEffect, useState, useCallback, useMemo } from 'react';
+import { Task, FilterStats } from '../../utils/types';
 import { ReportsView } from './ReportsView';
 import {
   Table,
@@ -55,6 +55,8 @@ import {
   sortTasksById,
   getTimeSinceLastSync,
   hashKey,
+  calculateProjectStats,
+  calculateTagStats,
 } from './tasks-utils';
 import Pagination from './Pagination';
 import { url } from '@/components/utils/URLs';
@@ -126,6 +128,24 @@ export const Tasks = (
   const [editedEntryDate, setEditedEntryDate] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [lastSyncTime, setLastSyncTime] = useState<number | null>(null);
+
+  // Calculate stats for projects
+  const projectStats = useMemo(() => {
+    const stats: Record<string, FilterStats> = {};
+    uniqueProjects.forEach((project) => {
+      stats[project] = calculateProjectStats(tasks, project);
+    });
+    return stats;
+  }, [tasks, uniqueProjects]);
+
+  // Calculate stats for tags
+  const tagStats = useMemo(() => {
+    const stats: Record<string, FilterStats> = {};
+    uniqueTags.forEach((tag) => {
+      stats[tag] = calculateTagStats(tasks, tag);
+    });
+    return stats;
+  }, [tasks, uniqueTags]);
 
   // Debounced search handler
   const debouncedSearch = debounce((value: string) => {
@@ -685,6 +705,7 @@ export const Tasks = (
                       selectedValues={selectedProjects}
                       onSelectionChange={setSelectedProjects}
                       className="flex-1 min-w-[140px]"
+                      optionStats={projectStats}
                     />
                     <MultiSelectFilter
                       title="Status"
@@ -699,6 +720,7 @@ export const Tasks = (
                       selectedValues={selectedTags}
                       onSelectionChange={setSelectedTags}
                       className="flex-1 min-w-[140px]"
+                      optionStats={tagStats}
                     />
                     <div className="pr-2">
                       <Dialog

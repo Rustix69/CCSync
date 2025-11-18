@@ -58,3 +58,9 @@ export type AutoSyncProps = {
   isAutoSyncEnabled: boolean;
   syncInterval: number; // <-- This prop controls the timer
 };
+
+export interface FilterStats {
+  completed: number;
+  total: number;
+  percentage: number;
+}

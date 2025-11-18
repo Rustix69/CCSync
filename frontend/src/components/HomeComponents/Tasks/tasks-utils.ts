@@ -1,4 +1,4 @@
-import { Task } from '@/components/utils/types';
+import { Task, FilterStats } from '@/components/utils/types';
 import { url } from '@/components/utils/URLs';
 import { format, parseISO } from 'date-fns';
 import { toast } from 'react-toastify';
@@ -182,4 +182,61 @@ export const hashKey = (key: string, email: string): string => {
     hash = hash & hash; // Convert to 32-bit integer
   }
   return Math.abs(hash).toString(36);
+};
+
+/**
+ * Calculate completion statistics for a specific project
+ * @param tasks - Array of all tasks
+ * @param project - Project name to calculate stats for
+ * @returns FilterStats object with completed, total, and percentage
+ */
+export const calculateProjectStats = (
+  tasks: Task[],
+  project: string
+): FilterStats => {
+  // Filter tasks by project and exclude deleted tasks
+  const projectTasks = tasks.filter(
+    (task) => task.project === project && task.status !== 'deleted'
+  );
+
+  const total = projectTasks.length;
+  const completed = projectTasks.filter(
+    (task) => task.status === 'completed'
+  ).length;
+
+  const percentage =
+    total > 0 ? Math.round((completed / total) * 1000) / 10 : 0;
+
+  return {
+    completed,
+    total,
+    percentage,
+  };
+};
+
+/**
+ * Calculate completion statistics for a specific tag
+ * @param tasks - Array of all tasks
+ * @param tag - Tag name to calculate stats for
+ * @returns FilterStats object with completed, total, and percentage
+ */
+export const calculateTagStats = (tasks: Task[], tag: string): FilterStats => {
+  // Filter tasks that include the tag and exclude deleted tasks
+  const tagTasks = tasks.filter(
+    (task) => task.tags && task.tags.includes(tag) && task.status !== 'deleted'
+  );
+
+  const total = tagTasks.length;
+  const completed = tagTasks.filter(
+    (task) => task.status === 'completed'
+  ).length;
+
+  const percentage =
+    total > 0 ? Math.round((completed / total) * 1000) / 10 : 0;
+
+  return {
+    completed,
+    total,
+    percentage,
+  };
 };
